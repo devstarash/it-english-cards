@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}</style>
+<title>Карточки IT English</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=Noto+Sans:wght@400;500&display=swap">
+<style>
+/* Layout: one study column — mode switch, index card, controls, then import and word list below */
+:root{
+  --bg:#e9edf3; --surface:#ffffff; --card-back:#f7f9fd; --ink:#16202c; --muted:#5a6677;
+  --line:#d3dae5; --rule:#c9d6ee; --accent:#2b54e0; --accent-ink:#ffffff; --redline:#d9534a;
+  --good:#1d8a58; --good-bg:#e1f3ea; --warn:#b4531c; --warn-bg:#fbebe0; --shadow:0 1px 2px rgba(22,32,44,.06),0 10px 28px rgba(22,32,44,.10);
+  --f-display:"Unbounded",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-ipa:"Noto Sans","Segoe UI","Arial Unicode MS","DejaVu Sans",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161e; --surface:#1a212c; --card-back:#1d2531; --ink:#e8edf4; --muted:#9aa6b8;
+  --line:#2c3644; --rule:#2a3a55; --accent:#7d9bff; --accent-ink:#0d1320; --redline:#e3706a;
+  --good:#5fd39b; --good-bg:#183326; --warn:#f0a06c; --warn-bg:#3a2518; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161e; --surface:#1a212c; --card-back:#1d2531; --ink:#e8edf4; --muted:#9aa6b8;
+  --line:#2c3644; --rule:#2a3a55; --accent:#7d9bff; --accent-ink:#0d1320; --redline:#e3706a;
+  --good:#5fd39b; --good-bg:#183326; --warn:#f0a06c; --warn-bg:#3a2518; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:700;font-size:1.25rem;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.count{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{font:500 .95rem var(--f-body);border:0;border-radius:9px;padding:10px 8px;background:transparent;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.opts{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.88rem;color:var(--muted)}
+.opts label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.opts input{accent-color:var(--accent);width:16px;height:16px}
+
+/* card */
+.scene{perspective:1400px;touch-action:pan-y}
+.card{position:relative;display:block;width:100%;height:320px;border:0;padding:0;background:none;cursor:pointer;
+  transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,.7,.2,1);font:inherit;color:inherit;text-align:center}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:34px 22px 22px;overflow:auto}
+.front{background:var(--surface)}
+.front::before{content:"";position:absolute;left:0;right:0;top:44px;height:2px;background:var(--redline);opacity:.55}
+.back{background:var(--card-back);transform:rotateY(180deg);
+  background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule) 31px 32px);background-position:0 12px}
+.tag{position:absolute;top:12px;left:16px;font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.idx{position:absolute;top:12px;right:16px;font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.known-dot{position:absolute;bottom:12px;right:16px;font-size:.72rem;font-weight:600;color:var(--good)}
+.main{font-family:var(--f-display);font-weight:500;font-size:2rem;line-height:1.2;text-wrap:balance;overflow-wrap:anywhere;max-width:100%}
+.main.m{font-size:1.45rem}
+.main.l{font-family:var(--f-body);font-weight:500;font-size:1.15rem;line-height:1.4}
+.ipa{font-family:var(--f-ipa);font-size:1.1rem;color:var(--accent)}
+.read{font-size:1rem;color:var(--muted)}
+.read b{color:var(--ink);font-weight:600}
+.sub{font-size:.95rem;color:var(--muted);font-weight:500}
+.hint-tap{position:absolute;bottom:12px;left:16px;font-size:.72rem;color:var(--muted)}
+
+/* controls */
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.btn{font:500 .95rem var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;
+  padding:11px 10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible,.seg button:focus-visible,.card:focus-visible,summary:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.icon{flex:0 0 52px}
+.btn.know{background:var(--good-bg);color:var(--good);border-color:transparent}
+.btn.again{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:40px 20px;text-align:center;color:var(--muted)}
+
+/* panels */
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+summary{cursor:pointer;padding:14px 16px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--f-display);color:var(--muted)}
+details[open] summary::after{content:"–"}
+.panel{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px;font-size:.9rem}
+.panel p{margin:0;color:var(--muted)}
+textarea{width:100%;min-height:170px;font:.88rem/1.45 var(--f-body);padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+.msg{font-size:.85rem;color:var(--good);min-height:1.2em}
+.msg.err{color:var(--warn)}
+code{font-size:.85em;background:var(--bg);padding:1px 5px;border-radius:4px}
+.wrap-btns{display:flex;flex-wrap:wrap;gap:8px}
+.wrap-btns .btn{flex:1 1 150px}
+
+.list{list-style:none;margin:0;padding:0 8px 8px;max-height:420px;overflow:auto}
+.list li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:8px;padding:8px;border-radius:8px;cursor:pointer;align-items:baseline}
+.list li:hover{background:var(--bg)}
+.list .ok{color:var(--good);font-size:.8rem}
+.list .w{font-weight:600}
+.list .t{color:var(--muted);font-size:.85rem;display:block}
+.foot{font-size:.8rem;color:var(--muted);text-align:center}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+@media (max-width:420px){.card{height:300px}.main{font-size:1.7rem}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>IT English: карточки</h1>
+    <span class="count" id="count"></span>
+  </header>
+
+  <div class="seg" role="group" aria-label="Режим">
+    <button id="mEn" aria-pressed="true">EN → RU</button>
+    <button id="mRu" aria-pressed="false">RU → EN</button>
+  </div>
+
+  <div class="opts">
+    <label><input type="checkbox" id="optUnknown"> Только невыученные</label>
+    <label><input type="checkbox" id="optHint"> Произношение сразу</label>
+  </div>
+
+  <div class="scene" id="scene">
+    <button class="card" id="card" aria-label="Перевернуть карточку">
+      <div class="face front" id="front"></div>
+      <div class="face back" id="back"></div>
+    </button>
+  </div>
+  <div class="empty" id="empty" hidden>Все слова в этом наборе отмечены как выученные. Снимите галочку «Только невыученные» или сбросьте прогресс.</div>
+
+  <div class="row" id="ctrl1">
+    <button class="btn icon" id="prev" aria-label="Предыдущая">←</button>
+    <button class="btn again" id="again">Ещё учу</button>
+    <button class="btn know" id="know">Знаю ✓</button>
+    <button class="btn icon" id="next" aria-label="Следующая">→</button>
+  </div>
+  <div class="row">
+    <button class="btn" id="speak">🔊 Произнести</button>
+    <button class="btn" id="shuffle">Перемешать</button>
+  </div>
+
+  <details id="impBox">
+    <summary>Импорт своих слов</summary>
+    <div class="panel">
+      <p>Вставьте список. Подходит формат как у вас: слово на одной строке, перевод на следующей; одиночные буквы-заголовки (A, B, C) пропускаются. Также понимает строки <code>слово⇥перевод</code> (экспорт из Quizlet) и <code>слово - перевод</code>.</p>
+      <textarea id="imp" placeholder="backup&#10;резервная копия&#10;&#10;boot&#10;загружаться; загружать"></textarea>
+      <div class="wrap-btns">
+        <button class="btn primary" id="impReplace">Заменить список</button>
+        <button class="btn" id="impAdd">Добавить к списку</button>
+        <button class="btn" id="impReset">Вернуть встроенный</button>
+      </div>
+      <div class="msg" id="impMsg" role="status"></div>
+    </div>
+  </details>
+
+  <details>
+    <summary id="listTitle">Все слова</summary>
+    <ul class="list" id="list"></ul>
+    <div class="panel"><button class="btn" id="resetKnown">Сбросить прогресс</button></div>
+  </details>
+
+  <p class="foot">Нажмите на карточку или пробел, чтобы перевернуть. Стрелки или свайп листают. Заглавная буква в «как читать» показывает ударение.</p>
+</div>
+
+<script>
+const BUILTIN = [
+["backup","резервная копия","/ˈbækʌp/","бЭкап"],
+["bikeshedding","чрезмерное обсуждение второстепенных деталей вместо более важной проблемы","/ˈbaɪkʃedɪŋ/","бАйкшединг"],
+["BIOS","BIOS; базовая система ввода-вывода","/ˈbaɪɒs/","бАйос"],
+["boot","загружаться; загружать","/buːt/","бут"],
+["borked","сленг: сломанный; запоротый; переставший нормально работать","/bɔːkt/","боркт"],
+["commercial software","коммерческое программное обеспечение","/kəˈmɜːʃl ˈsɒftweə/","кэмЁршл сОфтвэа"],
+["compatible","совместимый","/kəmˈpætəbl/","кэмпЭтэбл"],
+["connect to","подключить к; соединить с","/kəˈnekt tuː/","кэнЭкт ту"],
+["context menu","контекстное меню","/ˈkɒntekst ˌmenjuː/","кОнтекст мЕнью"],
+["decimal point","десятичная точка; при чтении десятичных дробей используется point","/ˈdesɪml pɔɪnt/","дЕсимл пойнт"],
+["delivery slip","накладная; документ, сопровождающий поставку","/dɪˈlɪvəri slɪp/","дилИвэри слип"],
+["destination","назначение","/ˌdestɪˈneɪʃn/","дестинЭйшн"],
+["dialogue box","диалоговое окно","/ˈdaɪəlɒɡ bɒks/","дАйэлог бокс"],
+["disconnect from","отключить; отсоединить от","/ˌdɪskəˈnekt frɒm/","дискэнЭкт фром"],
+["dogfooding","использование компанией собственного продукта внутри компании","/ˈdɒɡfuːdɪŋ/","дОгфудинг"],
+["fall back on","прибегнуть к запасному варианту","/fɔːl ˈbæk ɒn/","фол бЭк он"],
+["feature","функция; возможность программы","/ˈfiːtʃə/","фИча"],
+["filename","имя файла","/ˈfaɪlneɪm/","фАйлнэйм"],
+["flaky","нестабильный; то работающий, то нет","/ˈfleɪki/","флЭйки"],
+["go over budget","превысить бюджет","/ɡəʊ ˈəʊvə ˈbʌdʒɪt/","гоу Оувэ бАджит"],
+["graphical user interface","графический пользовательский интерфейс","/ˈɡræfɪkl ˈjuːzər ˈɪntəfeɪs/","грЭфикл Юзэр Интэфэйс"],
+["GUI","графический пользовательский интерфейс","/ˈɡuːi/","гУи (или джи-ю-Ай)"],
+["helpdesk technician","специалист службы технической поддержки","/ˈhelpdesk tekˈnɪʃn/","хЭлпдеск текнИшн"],
+["imperative","повелительная форма","/ɪmˈperətɪv/","импЕрэтив"],
+["kludgy","разг.: костыльный; неэлегантно сделанный","/ˈklʌdʒi/","клАджи"],
+["licence","лицензия","/ˈlaɪsns/","лАйсэнс"],
+["linear regression","линейная регрессия","/ˈlɪniə rɪˈɡreʃn/","лИниэ ригрЕшн"],
+["lock out","заблокировать доступ пользователю","/lɒk ˈaʊt/","лок Аут"],
+["maximise","разворачивать окно","/ˈmæksɪmaɪz/","мЭксимайз"],
+["minimise","сворачивать окно","/ˈmɪnɪmaɪz/","мИнимайз"],
+["narrow down","сузить круг возможных причин","/ˈnærəʊ daʊn/","нЭроу дАун"],
+["nought","ноль","/nɔːt/","нот"],
+["open-source software","программное обеспечение с открытым исходным кодом","/ˌəʊpən ˈsɔːs ˈsɒftweə/","Оупэн сорс сОфтвэа"],
+["pane","панель","/peɪn/","пэйн"],
+["partition","раздел; разбивать диск на разделы","/pɑːˈtɪʃn/","патИшн"],
+["PEBKAC","шутл., неформально: проблема вызвана действиями пользователя; буквально «problem exists between keyboard and chair»","/ˈpebkæk/","пЭбкэк"],
+["peripheral","периферийное устройство","/pəˈrɪfərəl/","пэрИфэрэл"],
+["plug into","подключить; вставить штекер в","/plʌɡ ˈɪntuː/","плаг Инту"],
+["pop-up menu","всплывающее меню","/ˈpɒp ʌp ˌmenjuː/","пОп ап мЕнью"],
+["processing","обработка","/ˈprəʊsesɪŋ/","прОусесинг"],
+["properties","свойства","/ˈprɒpətiz/","прОпэтиз"],
+["proprietary software","проприетарное программное обеспечение","/prəˈpraɪətri ˈsɒftweə/","прэпрАйэтри сОфтвэа"],
+["reboot","перезагружать","/ˌriːˈbuːt/","рибУт"],
+["resize","изменять размер","/ˌriːˈsaɪz/","рисАйз"],
+["resolution","разрешение","/ˌrezəˈluːʃn/","резэлЮшн"],
+["right-click","щёлкнуть правой кнопкой мыши","/ˌraɪt ˈklɪk/","райт клИк"],
+["roll back","откатить обновление или версию","/rəʊl ˈbæk/","роул бЭк"],
+["rule out","исключить возможную причину","/ruːl ˈaʊt/","рул Аут"],
+["screen resolution","разрешение экрана","/skriːn ˌrezəˈluːʃn/","скрин резэлЮшн"],
+["sequencer","маркер последовательности","/ˈsiːkwənsə/","сИквэнсэ"],
+["softener","смягчающее выражение","/ˈsɒfnə/","сОфнэ"],
+["specification","техническая характеристика; спецификация","/ˌspesɪfɪˈkeɪʃn/","спесификЭйшн"],
+["specs","технические характеристики; сокращение от specifications","/speks/","спекс"],
+["spin up","быстро запустить или создать сервер, виртуальную машину или среду","/spɪn ˈʌp/","спин Ап"],
+["spokesperson","представитель компании","/ˈspəʊkspɜːsn/","спОукспёсн"],
+["spreadsheet","электронная таблица","/ˈspredʃiːt/","спрЕдшит"],
+["supplier","поставщик","/səˈplaɪə/","сэплАйэ"],
+["time out","прервать операцию из-за превышения времени ожидания","/taɪm ˈaʊt/","тайм Аут"],
+["track down","найти, выявить источник проблемы","/træk ˈdaʊn/","трэк дАун"],
+["trade-off","компромисс: выигрыш в одном за счёт другого","/ˈtreɪd ɒf/","трЭйд оф"],
+["unplug from","отсоединить от; вынуть штекер из","/ʌnˈplʌɡ frɒm/","анплАг фром"],
+["upgrade","апгрейд; улучшение; улучшать","/ˈʌpɡreɪd/ (сущ.), /ʌpˈɡreɪd/ (глаг.)","Апгрэйд / апгрЭйд"],
+["value for money","хорошее соотношение цены и качества","/ˈvæljuː fə ˈmʌni/","вЭлью фэ мАни"],
+["vendor","поставщик программного обеспечения","/ˈvendə/","вЭндэ"],
+["virtual reality goggles","очки виртуальной реальности","/ˈvɜːtʃuəl riˈæləti ˈɡɒɡlz/","вЁчуэл риЭлити гОглз"],
+["within budget","в рамках бюджета; не выходя за бюджет","/wɪˈðɪn ˈbʌdʒɪt/","уиЗин бАджит"],
+["WLAN","беспроводная локальная сеть","/ˈdʌbljuː læn/","дАбл-ю лэн"],
+["yak shaving","цепочка побочных задач, которые приходится выполнять ради одной простой задачи","/ˈjæk ʃeɪvɪŋ/","як шЭйвинг"]
+].map(([en,ru,ipa,read])=>({en,ru,ipa,read}));
+
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+let deck=store.get("fc.deck",null)||BUILTIN.slice();
+let known=new Set(store.get("fc.known",[]));
+let mode=store.get("fc.mode","en");
+let onlyUnknown=store.get("fc.only",false);
+let hint=store.get("fc.hint",false);
+let order=[],pos=0,flipped=false;
+
+function buildOrder(keepWord){
+  const cur=keepWord||(order[pos]!=null&&deck[order[pos]]?deck[order[pos]].en:null);
+  order=deck.map((_,i)=>i).filter(i=>!onlyUnknown||!known.has(deck[i].en));
+  pos=Math.max(0,order.findIndex(i=>deck[i].en===cur));
+  if(pos<0)pos=0;
+}
+function sizeClass(t){return t.length>42?"l":t.length>18?"m":""}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function readHtml(r){return esc(r).replace(/([А-ЯЁ])/g,"<b>$1</b>")}
+function pron(w){
+  let h="";
+  if(w.ipa)h+=`<div class="ipa">${esc(w.ipa)}</div>`;
+  if(w.read)h+=`<div class="read">${readHtml(w.read)}</div>`;
+  return h;
+}
+function render(){
+  $("count").textContent=`выучено ${deck.filter(w=>known.has(w.en)).length} из ${deck.length}`;
+  $("mEn").setAttribute("aria-pressed",mode==="en");
+  $("mRu").setAttribute("aria-pressed",mode==="ru");
+  $("optUnknown").checked=onlyUnknown; $("optHint").checked=hint;
+  const has=order.length>0;
+  $("scene").hidden=!has; $("empty").hidden=has;
+  ["prev","again","know","next","speak","shuffle"].forEach(id=>$(id).disabled=!has);
+  renderList();
+  if(!has)return;
+  const w=deck[order[pos]];
+  const idx=`<span class="idx">${pos+1} / ${order.length}</span>`;
+  const k=known.has(w.en)?`<span class="known-dot">✓ знаю</span>`:"";
+  if(mode==="en"){
+    $("front").innerHTML=`<span class="tag">English</span>${idx}<div class="main ${sizeClass(w.en)}">${esc(w.en)}</div>${hint?pron(w):""}${k}<span class="hint-tap">нажмите, чтобы перевернуть</span>`;
+    $("back").innerHTML=`<span class="tag">Русский</span>${idx}<div class="main ${sizeClass(w.ru)}">${esc(w.ru)}</div><div class="sub">${esc(w.en)}</div>${pron(w)}${k}`;
+  }else{
+    $("front").innerHTML=`<span class="tag">Русский</span>${idx}<div class="main ${sizeClass(w.ru)}">${esc(w.ru)}</div>${k}<span class="hint-tap">нажмите, чтобы перевернуть</span>`;
+    $("back").innerHTML=`<span class="tag">English</span>${idx}<div class="main ${sizeClass(w.en)}">${esc(w.en)}</div>${pron(w)}${k}`;
+  }
+  $("card").classList.toggle("flipped",flipped);
+}
+function renderList(){
+  $("listTitle").textContent=`Все слова (${deck.length})`;
+  $("list").innerHTML=deck.map((w,i)=>`<li data-i="${i}"><span class="ok">${known.has(w.en)?"✓":""}</span><span><span class="w">${esc(w.en)}</span><span class="t">${esc(w.ru)}</span></span></li>`).join("");
+}
+function go(d){if(!order.length)return;flipped=false;pos=(pos+d+order.length)%order.length;render()}
+function flip(){flipped=!flipped;$("card").classList.toggle("flipped",flipped)}
+function mark(isKnown){
+  if(!order.length)return;
+  const w=deck[order[pos]];
+  if(isKnown)known.add(w.en);else known.delete(w.en);
+  store.set("fc.known",[...known]);
+  if(onlyUnknown&&isKnown){
+    order.splice(pos,1); if(pos>=order.length)pos=0; flipped=false; render();
+  }else go(1);
+}
+function speak(){
+  if(!order.length||!("speechSynthesis" in window))return;
+  const u=new SpeechSynthesisUtterance(deck[order[pos]].en);
+  u.lang="en-GB"; u.rate=.9;
+  const v=speechSynthesis.getVoices().find(v=>/^en[-_]GB/i.test(v.lang))||speechSynthesis.getVoices().find(v=>/^en/i.test(v.lang));
+  if(v)u.voice=v;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+function shuffle(){
+  for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
+  pos=0;flipped=false;render();
+}
+
+function parse(text){
+  const out=[];let pending=null;
+  const push=(en,ru)=>{en=en.trim();ru=ru.trim();if(en&&ru){
+    const b=BUILTIN.find(x=>x.en.toLowerCase()===en.toLowerCase());
+    out.push({en,ru,ipa:b?b.ipa:"",read:b?b.read:""})}};
+  for(let l of text.split(/\r?\n/)){
+    l=l.trim(); if(!l)continue;
+    if(/^[A-Za-zА-Яа-яЁё]$/.test(l))continue;
+    if(pending===null){
+      const tab=l.split("\t");
+      if(tab.length>=2&&tab[0].trim()&&tab[1].trim()){push(tab[0],tab.slice(1).join(" "));continue}
+      const m=l.match(/^(.+?)\s+[—–-]\s+(.+)$/);
+      if(m){push(m[1],m[2]);continue}
+      pending=l;
+    }else{push(pending,l);pending=null}
+  }
+  return {words:out,leftover:pending};
+}
+function msg(t,err){$("impMsg").textContent=t;$("impMsg").classList.toggle("err",!!err)}
+function doImport(replace){
+  const {words,leftover}=parse($("imp").value);
+  if(!words.length){msg("Не нашёл ни одной пары «слово — перевод». Проверьте, что перевод идёт строкой ниже слова.",true);return}
+  if(replace)deck=words;
+  else{const have=new Set(deck.map(w=>w.en.toLowerCase()));deck=deck.concat(words.filter(w=>!have.has(w.en.toLowerCase())))}
+  store.set("fc.deck",deck); pos=0; flipped=false; buildOrder(); render();
+  msg(`Загружено слов: ${words.length}.`+(leftover?` Строка «${leftover}» осталась без перевода.`:""));
+}
+
+$("card").addEventListener("click",()=>{if(swiped){swiped=false;return}flip()});
+$("prev").onclick=()=>go(-1); $("next").onclick=()=>go(1);
+$("know").onclick=()=>mark(true); $("again").onclick=()=>mark(false);
+$("speak").onclick=speak; $("shuffle").onclick=shuffle;
+$("mEn").onclick=()=>{mode="en";store.set("fc.mode",mode);flipped=false;render()};
+$("mRu").onclick=()=>{mode="ru";store.set("fc.mode",mode);flipped=false;render()};
+$("optUnknown").onchange=e=>{onlyUnknown=e.target.checked;store.set("fc.only",onlyUnknown);flipped=false;buildOrder();render()};
+$("optHint").onchange=e=>{hint=e.target.checked;store.set("fc.hint",hint);render()};
+$("impReplace").onclick=()=>doImport(true);
+$("impAdd").onclick=()=>doImport(false);
+$("impReset").onclick=()=>{deck=BUILTIN.slice();store.set("fc.deck",null);pos=0;flipped=false;buildOrder();render();msg("Вернул встроенный список.")};
+$("resetKnown").onclick=()=>{known.clear();store.set("fc.known",[]);buildOrder();render()};
+$("list").onclick=e=>{const li=e.target.closest("li");if(!li)return;
+  const w=deck[+li.dataset.i]; if(onlyUnknown&&known.has(w.en)){onlyUnknown=false;store.set("fc.only",false)}
+  buildOrder(w.en); flipped=false; render(); $("card").scrollIntoView({block:"center",behavior:"smooth"})};
+
+document.addEventListener("keydown",e=>{
+  if(/TEXTAREA|INPUT/.test(e.target.tagName))return;
+  if(e.key===" "){e.preventDefault();flip()}
+  else if(e.key==="ArrowRight")go(1);
+  else if(e.key==="ArrowLeft")go(-1);
+});
+let sx=0,sy=0,swiped=false;
+$("scene").addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+$("scene").addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){swiped=true;go(dx<0?1:-1);setTimeout(()=>swiped=false,400)}},{passive:true});
+if("speechSynthesis" in window)speechSynthesis.getVoices();
+
+buildOrder(); render();
+</script>
+</body>
+</html>
